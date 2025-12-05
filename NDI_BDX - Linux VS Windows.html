@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Visual Novel NDI</title>
+  <link rel="stylesheet" href="NDI_BDX.css">
+</head>
+<body>
+  <div id="game">
+    <div id="background"></div>
+
+    <!-- NOUVEAU : calque pour les sprites de personnages -->
+    <div id="characters"></div>
+
+    <div id="dialog-box">
+      <div id="name"></div>
+      <div id="text"></div>
+      <div id="choices"></div>
+    </div>
+  </div>
+
+  <script>
+    // Définition des scènes
+    let  score = 0
+    const scenes = {
+        salleInformaticien0 : {
+        bg: "imagesVisualNovel/windows.jpg",
+        name: "Informaticien",
+        text: "C'est pas possible...",
+        choices: [
+          { text: "Suite", next: "salleInformaticien1" },
+        ]
+      },
+      salleInformaticien1 : {
+        bg: "imagesVisualNovel/salleDeClasse.jpg",
+        sprite: "imagesVisualNovel/Quentin.png", // sprite devant le fond
+        spritePos: "left",
+        name: "Informaticien",
+        text: "Déjà ? Il faut que j'aille vite prévenir la proviseure.",
+        choices: [
+          { text: "Aller voir la proviseure", next: "couloir1" },
+        ]
+      },
+      couloir1: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "center",
+        name: "Informaticien",
+        text: "Où se trouve le bureau de la proviseure déjà ..? Ah oui là-bas.",
+        choices: [
+          { text: "Aller dans le bureau de la proviseure", next: "bureauProviseur1" }
+        ]
+      },
+      bureauProviseur1: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Informaticien",
+        text: "On a un énorme problème...",
+        choices: [
+          { text: "Suite", next: "bureauProviseur2" }
+        ]
+      },
+      bureauProviseur2: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "Ne me dis pas que...",
+        choices: [
+          { text: "...", next: "pdvEleve1" }
+        ]
+      },
+      pdvEleve1: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "C'est étrange, pourquoi l'informaticien court comme ça ? Il cache peut-être quelque chose, je devrai le suivre.",
+        choices: [
+          { text: "Aller dans le bureau du proviseur", next: "pdvEleve2" }
+        ]
+      },
+      pdvEleve2: {
+        bg: "imagesVisualNovel/porteRouge.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Qu'est-ce qui se passe..?",
+        choices: [
+          { text: "Écouter à la porte", next: "bureauProviseur3" }
+        ]
+      },
+      bureauProviseur3: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Informaticien",
+        text: "Windows 10, c'est bientôt la fin. Il faut vite changer mais comment faire ? On aurait dû le faire plus tôt...",
+        choices: [
+          { text: "Suite", next: "bureauProviseur4" }
+        ]
+      },
+      bureauProviseur4: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "Mais... déjà... C'est passé trop vite.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur5" }
+        ]
+      },
+      bureauProviseur5: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Informaticien",
+        text: "Il faut changer pour Linux.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur6" }
+        ]
+      },
+      bureauProviseur6: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "NON ! JAMAIS ! Il faut juste installer Windows 11 !",
+        choices: [
+          { text: "Suite", next: "bureauProviseur7" }
+        ]
+      },
+      bureauProviseur7: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Informaticien",
+        text: "Mais nos ordinateurs sont trop vieux, ils ne tiendront jamais. Et même s'ils tiennent, il y aura de grosses failles de sécurité.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur8" }
+        ]
+      },
+      bureauProviseur8: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "On n'a qu'à racheter de nouveaux ordinateurs !",
+        choices: [
+          { text: "Suite", next: "bureauProviseur9" }
+        ]
+      },
+      bureauProviseur9: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "Et puis, sérieusement... Qui voudrait s’attaquer à notre école ?",
+        choices: [
+          { text: "Suite", next: "bureauProviseur10" }
+        ]
+      },
+      bureauProviseur10: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Informaticien",
+        text: "La question n’est ni qui ni pourquoi, il faut juste penser que le risque zéro n’existe pas et remédier immédiatement à ce problème.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur11" }
+        ]
+      },
+      bureauProviseur11: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Proviseur",
+        text: "STOP ! Vous autres, vous n’êtes jamais contents de mes décisions. Votre soi-disant menace n’arrivera jamais, j’ai confiance en Microsoft. Veuillez partir immédiatement !",
+        choices: [
+          { text: "Suite", next: "pdvEleve3" }
+        ]
+      },
+      pdvEleve3: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Non, la proviseure veut vraiment racheter de nouveaux ordinateurs... Il faut que j'aille prévenir les autres.",
+        choices: [
+          { text: "Suite", next: "pdvEleve4" }
+        ]
+      },
+      pdvEleve4: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center", 
+        name: "t/p",
+        text: "Enfin, des élèves, Oh Amadéa !",
+        choices: [
+          { text: "Suite", next: "Amadea1" }
+        ]
+      },
+      Amadea1: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Qu'est-ce qu'il y a encore? T'as vu une araignée?",
+        choices: [
+          { text: "Suite", next: "pdvEleve5" }
+        ]
+      },
+      pdvEleve5: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Amadéa ! Il faut que tu écoutes ça ! Je suis allé espionner le proviseur et l'informaticien... C'est catastrophique !",
+        choices: [
+          { text: "Suite", next: "pdvEleve6" }
+        ]
+      },
+      pdvEleve6: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Il y a un gros problème avec Windows 10 et, au lieu de chercher une solution, la proviseur a décidé de changer tous les ordinateurs du lycée !",
+        choices: [
+          { text: "Suite", next: "Amadea2" }
+        ]
+      },
+      Amadea2: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "(Les yeux écarquillés, elle claque sa main sur la table.) NON ! Je refuse de laisser passer ça ! Un remplacement massif ?",
+        choices: [
+          { text: "Suite", next: "Amadea3" }
+        ]
+      },
+      Amadea3: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Penses-tu au prix, T/P ? C'est une décision budgétairement irresponsable et d'une paresse intellectuelle ahurissante !",
+        choices: [
+          { text: "C’est vrai. On ne peut pas laisser une décision aussi irresponsable se prendre sans réagir. On doit rassembler les autres !",
+           next: "AmadeaBis1",
+          effect: () => {score += 1}},
+          { 
+            text: "Je comprends, mais je ne veux pas de problèmes. On devrait peut-être juste en parler à un prof de confiance et rester en retrait.",
+           next: "Amadea4",
+            effect: () => {score -= 1}
+           }
+        ]
+      },
+      AmadeaBis1: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Je crois qu’on doit se battre !",
+        choices: [
+          { text: "Suite", next: "AmadeaBis2" },
+        ]
+      },
+      AmadeaBis2: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Je suis d'accord. On ne peut pas laisser une décision aussi stupide et coûteuse se faire dans notre dos. On doit mobiliser les gens pour les arrêter.",
+        choices: [
+          { text: "Suite", next: "AmadeaBis3" },
+        ]
+      },
+      AmadeaBis3: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: " C'est la T/P que j'aime ! Très bien. Si Mme Saray veut jouer, nous allons lui montrer que cet établissement n'est pas un endroit où l'on prend des décisions unilatérales ! Allons réunir LA TEAM !",
+        choices: [
+          { text: "Suite", next: "Amadea4" },
+        ]
+      },
+      Amadea4: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "LA TEAM ! Ce que T/P vient d’apprendre est inadmissible ! Saray veut changer l'intégralité des machines Windows au lieu de les réparer ou de trouver une alternative viable ! C'est un gâchis d'argent public et une décision aberrante !",
+        choices: [
+          { text: "Suite", next: "Amadea5" }
+        ]
+      },
+      Amadea5: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Nous ne pouvons pas rester sans rien faire. Nous devons former un front, réunir nos arguments et proposer une alternative crédible. C'est une mobilisation générale ! Qui est avec moi ?",
+        choices: [
+          { text: "Suite", next: "Groupe1" }
+        ]
+      },
+      Groupe1: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/groupe.png",
+        spritePos: "left",
+        name: "Groupe",
+        text: "Ouais ! On les laissera pas faire ! Moi vivant jamais!",
+        choices: [
+          { text: "Suite", next: "Amadea6" }
+        ]
+      },
+      Amadea6: {
+        bg: "imagesVisualNovel/hall.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Penses-tu au prix, T/P ? C'est une décision budgétairement irresponsable et d'une paresse intellectuelle ahurissante !",
+        choices: [
+          { text: "Suite", next: "celia2" } 
+        ]
+      },
+
+
+      celia2: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Vous voulez changer les ordinateurs ?! Vous savez l’impact écologique que provoquerait le changement de TOUS les ordinateurs de l’établissement? ",
+        choices: [
+          { text: "Suite", next: "celia3" } 
+        ]
+      },
+
+      celia3: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Les déchets électroniques contiennent des substances tellement toxiques qui, en l’absence de traitement adéquat, peuvent polluer les écosystèmes et affecter les cycles naturels et même les chaînes alimentaires… ",
+        choices: [
+          { text: "Suite", next: "celia4" } 
+        ]
+      },
+
+      celia4: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Quelle ironie!... créer un nouveau monde, celui de l’informatique, pour en détruire un autre: le nôtre.",
+        choices: [
+          { text: "Suite", next: "celia5" } 
+        ]
+      },
+
+      celia5: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Imaginez le jour où tous les êtres vivants seront contaminés et ont muté en quelque chose à l’opposé du naturel: vous, t/p, mangeur de viande, vous ne consommerez alors que du micro-plastique et des nano-particules, enrobés de chair à saucisse.",
+        choices: [
+          { text: "Suite", next: "jardin1" } 
+        ]
+      },
+
+      jardin1: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p (paniqué)",
+        text: "",
+        choices: [
+          { text: "je n’aurais jamais imaginé de telles conséquences, que pouvons-nous faire?", 
+          next: "celia6",
+        effect: () => {score += 1} },
+          { text: "Je comprends ton ignorance mais fais attention à tes mots…", 
+          next: "celia7",
+        effect: () => {score -= 1} },
+        ]
+      },
+
+      celia6: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "C’est un miracle! , mes efforts sont enfin reconnus!",
+        choices: [
+          { text: "Suite", next: "celia8" } 
+        ]
+      },
+
+      celia7: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Je comprends ton ignorance mais fais attention à tes mots…",
+        choices: [
+          { text: "Suite", next: "celia8" } 
+        ]
+      },
+
+      celia8: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Mais ne panique pas, nous pouvons agir!!! Penses-tu qu’il est nécessaire de changer tout le parc informatique du lycée? Il est surement possible d’allonger la durée de vie de certains équipements, comme les écrans par exemple.",
+        choices: [
+          { text: "Suite", next: "jardin2" } 
+        ]
+      },
+
+      jardin2: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "C’est une idée qui surpasse largement la mienne! Mais elle me semble quelque peu incomplète…",
+        choices: [
+          { text: "Suite", next: "celia9" }
+        ]
+      },
+
+      celia9: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Effectivement, il ne faut pas oublier que les éuipements qu’on change peuvent être données aux personnes qui ont un accès restreint aux ressources informatiques. ",
+        choices: [
+          { text: "Suite", next: "jardin3" } 
+        ]
+      },
+
+      jardin3: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p (enjouée)",
+        text: "tout cela me semble passionnant! Et pour ne pas reproduire les erreurs du passé, nous pourrions organiser de la sensibilisation à la sobriété numérique pour tous les étudiants et le personnel de l’établissement. ",
+        choices: [
+          { text: "Je te nomme référente reconditionnement numérique!",
+           next: "celia10",
+          effect: () => {score += 1} },
+          { text: "Au revoir.", 
+          next: "celia11",
+        effect: () => {score -= 1} },
+        ]
+      },
+
+      celia10: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "Avec plaisir!!!",
+        choices: [
+          { text: "Suite", next: "pdvEleve7" } 
+        ]
+      },
+
+      celia11: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Célia",
+        text: "AU revoir, je retourne planter mon arbre.",
+        choices: [
+          { text: "Suite", next: "pdvEleve7" } 
+        ]
+      },
+
+      pdvEleve7: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        text: "(Célia part)",
+        choices: [
+          { text: "Suite", next: "jardin4" } 
+        ]
+      },
+
+      jardin4: {
+        bg: "imagesVisualNovel/jardin.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "tout cela me semble passionnant! Et pour ne pas reproduire les erreurs du passé, nous pourrions organiser de la sensibilisation à la sobriété numérique pour tous les étudiants et le personnel de l’établissement. ",
+        choices: [
+          { text: "Mon plan énergétique est à présent prêt  mais il reste certains problèmes à régler...", next: "couloir2" }
+        ]
+      },
+
+
+
+
+
+
+      couloir2: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "L'argument écologique de Celia est puissant, mais je sens qu'il ne suffira pas à faire plier Mme Saray.",
+        choices: [
+          { text: "Suite", next: "couloir3" }
+        ]
+      },
+
+      couloir3: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Elle ne voit que par l'efficacité immédiate, peu importe le coût.",
+        choices: [
+          { text: "Suite", next: "couloir4" }
+        ]
+      },
+
+
+      couloir4: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "On a besoin d'un angle d'attaque financier. Si on lui prouve qu'elle va ruiner le lycée, elle sera obligée d'écouter.",
+        choices: [
+          { text: "Suite", next: "couloir5" }
+        ]
+      },
+    
+      couloir5: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "C'est sûr. Mais on n'a pas les chiffres exacts...",
+        choices: [
+          { text: "Suite", next: "pdvEleve8" }
+        ]
+      },
+
+      pdvEleve8: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "(Quentin, qui passait par là, s'arrête net en entendant la conversation. Il s'approche du groupe, regardant autour de lui pour vérifier que la proviseure n'est pas là.)",
+        choices: [
+          { text: "Suite", next: "Quentin1" }
+        ]
+      },
+      Quentin1: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Vous parlez de 'ruiner le lycée' ? Si vous parlez du plan de renouvellement du parc informatique, vous êtes loin du compte. C'est pire que ça.",
+        choices: [
+          { text: "Suite", next: "couloir6" }
+        ]
+      },
+
+      couloir6: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Quentin ! Tu es au courant de notre plan ?",
+        choices: [
+          { text: "Suite", next: "Quentin2" }
+        ]
+      },
+
+      Quentin2: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Difficile de l'ignorer. Écoutez, si la directrice persiste à racheter des licences et du matériel neuf, le lycée va subir de plein fouet des restrictions budgétaires drastiques.",
+        choices: [
+          { text: "Suite", next: "Quentin3" }
+        ]
+      },
+
+      Quentin3: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Adieu les voyages scolaires, adieu le budget du club théâtre... Tout passera dans les factures de Microsoft.",
+        choices: [
+          { text: "Suite", next: "celia1" }
+        ]
+      },
+
+      celia1: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "left",
+        name: "Célia",
+        text: "C'est aberrant ! Tout cet argent pour polluer plus ?",
+        choices: [
+          { text: "Suite", next: "Quentin4" }
+        ]
+      },
+      
+
+      Quentin4: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Exactement. Mais ce n'est pas tout. Le vrai problème, c'est la dépendance. En restant sous Windows 10 ou en migrant vers le 11 avec des contrats verrouillés, on perd notre souveraineté numérique.",
+        choices: [
+          { text: "Suite", next: "couloir7" }
+        ]
+      },
+
+      couloir7: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Souveraineté numérique ? Tu veux dire qu'on ne contrôle plus rien ?",
+        choices: [
+          { text: "Suite", next: "Quentin5" }
+        ]
+      },
+
+      Quentin5: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "C'est ça. Nos données, nos outils, notre façon d'enseigner... tout appartient à une multinationale américaine. Si on passait au logiciel libre, on reprendrait le pouvoir.",
+        choices: [
+          { text: "Suite", next: "Quentin6" }
+        ]
+      },
+
+      Quentin6: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Ce que je propose, c'est une vraie transformation numérique de l'établissement. Pas juste changer des machines, mais changer de mentalité. Construire un système durable et indépendant.",
+        choices: [
+          { text: "Suite", next: "Amadea7" }
+        ]
+      },
+
+      Amadea7: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "C'est l'argument ultime. L'argent et la liberté. T/P, qu'est-ce qu'on fait de ces infos ?",
+        choices: [
+          { text: "Suite", next: "couloir8" }
+        ]
+      },
+
+      couloir8: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "",
+        choices: [
+          { text: "C'est exactement ce qu'il nous faut ! Quentin, si on combine la souveraineté numérique avec l'économie budgétaire, Saray ne pourra pas refuser. Aide-nous à monter le dossier technique !ouveraineté numérique ? Tu veux dire qu'on ne contrôle plus rien ?",
+           next: "Quentin7",
+          effect: () => {score += 1} },
+          { text: "Oula, 'Souveraineté', 'Transformation'... c'est des mots trop compliqués pour elle. Quentin, dis-nous juste combien ça coûte. On va seulement lui parler des restrictions budgétaires, ça lui fera peur.", 
+          next: "Quentin9",
+        effect: () => {score -= 1} }   
+        ]
+      },
+
+
+      Quentin7: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin (sourit enfin)",
+        text: "Enfin des élèves qui comprennent l'enjeu ! Vous avez raison. L'argument de la liberté est noble, mais couplé à celui de l'argent, il est invincible.",
+        choices: [
+          { text: "Suite", next: "Quentin8" }
+        ]
+      },
+
+
+
+      Quentin8: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin",
+        text: "Je vais vous sortir les rapports de coûts prévisionnels. Avec ça, votre dossier pour le NIRD sera en béton. On va lui montrer ce que c'est, une vraie transformation numérique.",
+        choices: [
+          { text: "Suite", next: "couloir8" }
+        ]
+      },
+
+      couloir8: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Souveraineté numérique ? Tu veux dire qu'on ne contrôle plus rien ?",
+        choices: [
+          { text: "Suite", next: "Quentin5" }
+        ]
+      },
+
+      Quentin9: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin (Soupire et croise les bras) ",
+        text: "C'est dommage de réduire ça à une simple histoire de comptable... Si vous ne comprenez pas l'enjeu de la souveraineté numérique, vous ne résoudrez le problème qu'à moitié.",
+        choices: [
+          { text: "Suite", next: "Quentin10" }
+        ]
+      },
+
+      Quentin10: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "left",
+        name: "Quentin (Soupire et croise les bras) ",
+        text: "Mais bon... si vous voulez juste parler gros sous, oui, les restrictions budgétaires seront énormes. Dites-lui qu'elle ne pourra plus payer le chauffage l'hiver prochain, ça la calmera peut-être.",
+        choices: [
+          { text: "Suite", next: "couloir9" }
+        ]
+      },
+
+      couloir9: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p",
+        text: "Heu... merci Quentin. On va essayer ça.",
+        choices: [
+          { text: "Suite", next: "pdvEleve9" }
+        ]
+      },
+
+      pdvEleve9: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "(Quentin s'éloigne en secouant la tête, déçu que la vision globale ne soit pas comprise. Le groupe a l'info, mais a perdu un allié passionné.)",
+        choices: [
+          { text: "Suite", next: "pdvEleve10" }
+        ]
+      },
+      pdvEleve10: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Nous avons l'argument écologique de Célia et l'argument financier de Quentin. Mais pour que le projet tienne la route, il nous faut une solution concrète pour remplacer Windows. Il faut changer de plan.",
+        choices: [
+          { text: "Suite", next: "pdvEleve11" }
+        ]
+      },
+      pdvEleve11: {
+        bg: "imagesVisualNovel/couloirNormal.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Anna, on a besoin de toi. On a une stratégie pour contrer la proviseure, mais il nous manque le 'comment'.",
+        choices: [
+          { text: "Suite", next: "Anna1" }
+        ]
+      },
+      Anna1: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Anna, on a besoin de toi. On a une stratégie pour contrer la proviseure, mais il nous manque le 'comment'.",
+        choices: [
+          { text: "Suite", next: "pdvEleve12" }
+        ]
+      },
+      pdvEleve12: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "C'est simple : on ne remplace pas les pc, on les reconditionne. On garde le matériel actuel, mais on change le système à l'intérieur.",
+        choices: [
+          { text: "Suite", next: "Quentin11" }
+        ]
+      },
+      Quentin11: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "right",
+        name: "Quentin",
+        text: "Techniquement, c'est faisable. Mais il faut un système d'exploitation léger et sécurisé.",
+        choices: [
+          { text: "Suite", next: "Anna2" }
+        ]
+      },
+      Anna2: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Vous pensez à Linux, n'est-ce pas ?. C'est une excellente piste. D'ailleurs, vous n'êtes pas les seuls à y penser. Saviez-vous que de plus en plus de collectivités s’orientent vers les logiciels libres et les communs numériques ?.",
+        choices: [
+          { text: "Suite", next: "Amadea7" }
+        ]
+      },
+      Amadea7: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/ama.png",
+        spritePos: "right",
+        name: "Amadéa",
+        text: "Les 'communs numériques'  ? Ça sonne comme un truc de hippie, Anna.",
+        choices: [
+          { text: "Suite", next: "Anna3" }
+        ]
+      },
+      Anna3: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Détrompe-toi. C'est l'avenir de l'éducation. Au lieu d'acheter des licences fermées, on utilise des ressources partagées. Il existe des outils formidables comme la forge des communs numériques éducatifs ou encore la messagerie sécurisée Tchap.",
+        choices: [
+          { text: "Suite", next: "pdvEleve13" }
+        ]
+      },
+      pdvEleve13: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Tchap ? La forge ?",
+        choices: [
+          { text: "Suite", next: "Anna4" }
+        ]
+      },
+      Anna4: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Oui. Ce sont des espaces où nous sommes en capacité de réunir, fédérer, mutualiser et documenter nos connaissances. Si le lycée passe à Linux et aux logiciels libres, on ne fait pas 'juste des économies'. On rejoint un mouvement national. On apprend aux élèves à partager le savoir plutôt qu'à le consommer.",
+        choices: [
+          { text: "Suite", next: "pdvEleve14" }
+        ]
+      },
+      pdvEleve14: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "*C'est ça la clé de la communication ! Il ne faut pas présenter ça comme une 'réparation bon marché', mais comme une adhésion à une communauté éducative moderne.*",
+        choices: [
+          { text: "Anna a raison. Notre axe de communication doit être le partage. On va dire à Saray qu'en utilisant la forge et les logiciels libres, le lycée va briller en devenant un modèle de communs numériques. On va fédérer les profs autour de ce projet !",
+           next: "AnnaBisBon1",
+          effect: () => {score += 1} },
+          { text: "Mouais, Tchap et la Forge, c'est un peu abstrait. On va juste dire qu'on installe Linux parce que c'est gratuit. L'important, c'est de dire qu'on reconditionne pour ne rien payer. Pas besoin de parler de 'mutualiser', ça fait trop de travail.", 
+          next: "AnnaBisMauv1",
+        effect: () => {score -= 1} }
+        ]
+      },
+      AnnaBisBon1: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Exactement T/P ! C'est ce qui touchera le corps enseignant.",
+        choices: [
+          { text: "Suite", next: "AnnaBisBon2" }
+        ]
+      },
+      AnnaBisBon2: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna ",
+        text: "En parlant de mutualiser et documenter, je peux préparer une campagne d'information au CDI. On montrera que l'État lui-même soutient ces initiatives. Si on prouve que c'est un gage de qualité pédagogique, Saray ne pourra pas dire que c'est du bricolage.",
+        choices: [
+          { text: "Suite", next: "AnnaBisBon3" }
+        ]
+      },
+      AnnaBisBon3: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Parfait. Avec l'appui 'institutionnel' d'Anna, notre dossier devient intouchable. (Anna sort une tablette et commence à noter des idées de slogans. L'équipe a maintenant une légitimité pédagogique.)",
+        choices: [
+          { text: "Suite", next: "Loic1" }
+        ]
+      },
+      AnnaBisMauv1: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Tu passes à côté de l'essentiel... Si tu ne vois Linux que comme un outil 'gratuit', tu vas braquer les professeurs qui auront peur de ne plus savoir utiliser leurs outils.",
+        choices: [
+          { text: "Suite", next: "AnnaBisMauv2" }
+        ]
+      },
+      AnnaBisMauv2: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/Anna.png",
+        spritePos: "right",
+        name: "Anna",
+        text: "Sans la volonté de fédérer et de documenter le changement, le reconditionnement sera vu comme une régression, pas comme un progrès. Je vous aiderai pour la forme, mais sans conviction.",
+        choices: [
+          { text: "Suite", next: "AnnaBisMauv3" }
+        ]
+      },
+      AnnaBisMauv3: {
+        bg: "imagesVisualNovel/bibli.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "On verra bien. L'essentiel c'est que les PC marchent, non ? (Anna soupire. L'argumentaire technique est là, mais l'âme du projet pédagogique manque. Convaincre les profs sera plus dur.)",
+        choices: [
+          { text: "Suite", next: "Loic1" }
+        ]
+      },
+
+      Loic1: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc (Tape furieusement)",
+        text: "Sérieusement Adrien, tu es encore sous Debian Stable ? Ton noyau date de l'époque où les disquettes existaient encore. C'est de l'archéologie, pas de l'informatique !",
+        choices: [
+          { text: "Suite", next: "Adrien1" }
+        ]
+      },
+
+      Adrien1: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien (Calme, imperturbable)",
+        text: " Ça s'appelle la ‘stabilité’, Loic. Un concept étranger aux utilisateurs d'Arch Linux comme toi qui passent leurs nuits à réparer leur affichage graphique après une simple mise à jour.",
+        choices: [
+          { text: "Suite", next: "Loic2" }
+        ]
+      },
+
+      Loic2: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc",
+        text: "Je vis sur le bleeding edge, moi monsieur ! Je compile mes paquets ! Je ne suis pas un assisté !",
+        choices: [
+          { text: "Suite", next: "info1" }
+        ]
+      },
+
+      info1: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p (Hésitant, s'approche doucement)",
+        text: "Hum... Excusez-moi ?",
+        choices: [
+          { text: "Suite", next: "info2" }
+        ]
+      },
+
+      info2: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        text: "(Ils s'arrêtent net de taper. Ils pivotent ensemble vers T/P, le regard noir, parfaitement synchronisés.)",
+        choices: [
+          { text: "Suite", next: "lesDeux1" }
+        ]
+      },
+
+      lesDeux1: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc et Adrien (en coeur, glacial)",
+        text: "Vous n'êtes pas assez experts pour comprendre.",
+        choices: [
+          { text: "Suite", next: "info3" }
+        ]
+      },
+
+      info3: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p (Levant les mains en signe de paix) ",
+        text: "Je... Je ne veux rien comprendre ! Je viens de la part d'Anna. On a un plan pour sauver les ordis du lycée, mais il nous faut un truc... ‘Linux’ ? Mais un truc simple. Pas de code bizarre.",
+        choices: [
+          { text: "Suite", next: "Adrien2" }
+        ]
+      },
+
+      Adrien2: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien (se radocit un peu)",
+        text: " Ça s'appelle la ‘stabilité’, Loic. Un concept étranger aux utilisateurs d'Arch Linux comme toi qui passent leurs nuits à réparer leur affichage graphique après une simple mise à jour.",
+        choices: [
+          { text: "Suite", next: "Loic3" }
+        ]
+      },
+
+      Loic3: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc",
+        text: " Bon, écoute le novice. On n'est pas d'accord sur grand-chose, Adrien et moi. Lui aime les systèmes pour les bibliothécaires, et moi pour les dieux du code...",
+        choices: [
+          { text: "Suite", next: "Adrien3" }
+        ]
+      },
+
+      Adrien3: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "... Mais on est d'accord sur une chose : pour le lycée, la solution c'est Linux.",
+        choices: [
+          { text: "Suite", next: "Loic4" }
+        ]
+      },
+
+      Loic4: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc",
+        text: "C'est basé sur une distribution ‘grand public’ (il grimace). C'est léger, c'est rapide. Ça tourne même sur les épaves du CDI.",
+        choices: [
+          { text: "Suite", next: "Adrien4" }
+        ]
+      },
+
+      Adrien4: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "Et il y a une barre d'icônes en bas, comme sur vos Mac ou Windows. Donc même les profs qui paniquent quand la corbeille change de place ne seront pas perdus.",
+        choices: [
+          { text: "Suite", next: "info4" }
+        ]
+      },
+
+      info4: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p ",
+        text: "D'accord... ça a l'air bien. Mais j'ai entendu dire que le réseau du lycée était compliqué avec le rectorat... Si on installe votre truc, ça ne va pas tout casser ?",
+        choices: [
+          { text: "Suite", next: "Loic5" }
+        ]
+      },
+
+      Loic5: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc (Sourit)",
+        text: "Ah, le réseau. Si tu installes ça en brut sur le disque dur, le pare-feu va faire une crise cardiaque et Mme. Saray nous tuera tous.",
+        choices: [
+          { text: "Suite", next: "info5" }
+        ]
+      },
+
+      info5: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p ",
+        choices: [
+          { text: "Oula, je ne veux rien casser du tout ! Est-ce qu'il y a un moyen d'essayer votre système sans toucher à ce qu'il y a déjà ? Juste pour montrer aux profs que ça marche, sans risque ?", 
+          next: "info6",
+        effect: () => {score += 1} },
+          { text: "Bof, l'informatique c'est magique, non ? Vous n'avez qu'à tout effacer et mettre le nouveau système. Si le réseau plante, vous le réparerez. L'important c'est d'aller vite !" ,
+           next:"info8",
+          effect: () => {score -= 1}}
+
+        ]
+      },
+
+      info6: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        text: "(Adrien hoche la tête, visiblement soulagé. Loïc arrête de faire tourner son stylo.)",
+        choices: [
+          { text: "Suite", next: "Adrien5" }
+        ]
+      },
+
+      Adrien5: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "Enfin un utilisateur qui réfléchit avant de cliquer. C'est rare.",
+        choices: [
+          { text: "Suite", next: "Loic6" }
+        ]
+      },
+
+      Loic6: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc ",
+        text: "Tu as raison. On ne touche pas au disque dur pour l'instant. On va utiliser la technique du 'Live USB'",
+        choices: [
+          { text: "Suite", next: "info7" }
+        ]
+      },
+
+      info7: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p ",
+        text: " Le... quoi ?",
+        choices: [
+          { text: "Suite", next: "Adrien6" }
+        ]
+      },
+
+      Adrien6: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "(Soupir) Laisse tomber, je ne pense pas que tu aies les compétences pour comprendre..",
+        choices: [
+          { text: "Suite", next: "Loic7" }
+        ]
+      },
+
+      Loic7: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc ",
+        text: "Mais surtout, ne le prend pas mal.. Tu as sûrement d’autres compétences quelque part, n’est ce pas..?",
+        choices: [
+          { text: "Suite", next: "info7" }
+        ]
+      },
+
+      info7: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p ",
+        text: " Oh euh.. D’accord.? Donnez moi juste cette clé!",
+        choices: [
+          { text: "Suite", next: "info8" }
+        ]
+      },
+
+      info8: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        text: "(Loïc explose de rire. Adrien se prend la tête dans les mains, désespéré.)",
+        choices: [
+          { text: "Suite", next: "Adrien7" }
+        ]
+      },
+
+
+      Adrien7: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "‘L'informatique c'est magique’... J'ai mal à mon diplôme.",
+        choices: [
+          { text: "Suite", next: "Loic8" }
+        ]
+      },
+
+      Loic8: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc ",
+        text: "Tu es le genre de personne à désinstaller le terminal pour faire de la place, c'est ça ?",
+        choices: [
+          { text: "Suite", next: "Adrien8" }
+        ]
+      },
+
+      Adrien8: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "Écoute-moi bien. Si on efface tout maintenant, lundi matin c'est l'émeute. Plus d'imprimante, plus de notes, plus de réseau. On ne va certainement pas te laisser faire n'importe quoi.",
+        choices: [
+          { text: "Suite", next: "Loic9" }
+        ]
+      },
+
+      Loic9: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Loïc ",
+        text: "On va te donner une clé USB qui lance le système sans rien installer. C'est une sécurité anti-boulet.",
+        choices: [
+          { text: "Suite", next: "Adrien9" }
+        ]
+      },
+
+      Adrien9: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/loic-adrien.png",
+        spritePos: "left",
+        name: "Adrien",
+        text: "Contente-toi de brancher la clé et de ne toucher à RIEN d'autre. Et s'il te plaît, sors de la salle avant que je ne fasse une réaction allergique à ton ignorance.",
+        choices: [
+          { text: "Suite", next: "info9" }
+        ]
+      },
+
+      info9: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "center",
+        name: "t/p (Vexé(e)) ",
+        text: "C'est bon... Je voulais juste aider.",
+        choices: [
+          { text: "Suite", next: "info10" }
+        ]
+      },
+
+      info10: {
+        bg: "imagesVisualNovel/salleInfoSombre.jpeg",
+        text: "(T/P part avec la clé, sous les regards méprisants du duo.)",
+        choices: [
+          { text: "Suite", next: "bureauProviseur12" }
+        ]
+      },
+      bureauProviseur12: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "left",
+        name: "t/p",
+        text: "Nous avons les arguments, la clé USB de démo, et l'équipe est au complet. Corentin, notre 'mini-reporter', a passé la nuit à synthétiser tout ça. C'est notre dernière chance.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur13" }
+        ]
+      },
+      bureauProviseur13: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: " (Fronce les sourcils) Je vous écoute. Je vous accorde cinq minutes pour justifier pourquoi je devrais écouter un groupe d'élèves plutôt que de signer le contrat de renouvellement du parc informatique.",
+        choices: [
+          { text: "Suite", next: "Corentin1" }
+        ]
+      },
+      Corentin1: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "(Se tient droit, une tablette à la main. Il est confiant et passionné.) Madame la Proviseure, nous ne sommes pas là pour vous faire perdre du temps. Nous sommes là pour vous proposer la solution la plus responsable, économique, et visionnaire pour cet établissement.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur14" }
+        ]
+      },
+      bureauProviseur14: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: "(Sèchement) Commencez.",
+        choices: [
+          { text: "Suite", next: "Corentin2" }
+        ]
+      },
+      Corentin2: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "Le problème de Windows 10 est réel, mais votre solution de remplacement est une erreur. Nous proposons de lancer la Démarche NIRD : le Numérique Inclusif, Responsable et Durable.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur15" }
+        ]
+      },  
+      bureauProviseur15: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        text: "(Corentin se tourne vers T/P et Amadéa pour un bref hochement de tête complice.)",
+        choices: [
+          { text: "Suite", next: "bureauProviseur16" }
+        ]
+      },  
+      bureauProviseur16: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme saray",
+        text: "NIRD ? Encore un acronyme farfelu inventé par des lycéens pour éviter d'étudier.",
+        choices: [
+          { text: "Suite", next: "Corentin3" }
+        ]
+      },
+      Corentin3: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "Pas du tout, Madame. C'est une démarche structurante qui répond aux trois enjeux majeurs de l'Éducation Nationale. Nous l'avons synthétisée dans ce que nous appelons la 'Triple Victoire' :",
+        choices: [
+          { text: "Suite", next: "Corentin4" }
+        ]
+      },
+      Corentin4: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "En rachetant tout le parc, vous générez des tonnes de déchets électroniques toxiques et vous participez à une pollution massive que Célia vous a détaillée.",
+        choices: [
+          { text: "Suite", next: "celia12" }
+        ]
+      },
+      celia12: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/celia.png",
+        spritePos: "right",
+        name: "Celia",
+        text: "(Intervient) Madame Saray, un ordinateur ancien peut revivre. Chaque machine reconditionnée, c'est une machine qui n'est pas jetée et qui n'est pas rachetée. Nous formons les élèves à la sobriété numérique. C'est notre contribution concrète au développement durable.",
+        choices: [
+          { text: "Suite", next: "Corentin5" }
+        ]
+      },
+      Corentin5: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "En rachetant tout le parc, vous générez des tonnes de déchets électroniques toxiques et vous participez à une pollution massive que Célia vous a détaillée.",
+        choices: [
+          { text: "Suite", next: "Corentin6" }
+        ]
+      },
+      Corentin6: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "Le renouvellement sous licence propriétaire mènera inévitablement à des restrictions budgétaires drastiques pour le lycée. Les contrats verrouillés nous enlèvent notre souveraineté numérique.",
+        choices: [
+          { text: "Suite", next: "Quentin12" }
+        ]
+      },
+      Quentin12: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Quentin.png",
+        spritePos: "right",
+        name: "Quentin",
+        text: "En adoptant des logiciels libres comme Linux NIRD, nous éliminons le coût des licences et nous prolongeons la vie du matériel de dix ans. L'établissement maîtrise ses choix technologiques et ses données, sans dépendre d'une multinationale. C'est l'argent de l'établissement qui reste au service de l'établissement.",
+        choices: [
+          { text: "Suite", next: "Corentin7" }
+        ]
+      },
+      Corentin7: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "Enfin, la Démarche NIRD n'est pas un bricolage, mais une adhésion à un mouvement national. Grâce à Anna, nous savons que des collectivités s'orientent vers les communs numériques.",
+        choices: [
+          { text: "Suite", next: "Corentin8" }
+        ]
+      },
+      Corentin8: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "Nous pouvons utiliser la Forge des communs numériques éducatifs et Tchap pour mutualiser nos connaissances avec d'autres lycées. Le système Linux, comme Loic et Adrien l'ont prouvé, est léger, stable et bootable sur clé USB.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur17" }
+        ]
+      },
+      bureauProviseur17: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: "(Elle se redresse, intéressée malgré elle) La clé USB... Qu'est-ce que c'est que cette histoire de clé ?",
+        choices: [
+          { text: "Suite", next: "CorentinPrudent" }
+        ]
+      },
+
+      CorentinPrudent: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "(Présente la clé USB) C'est la preuve. Cette clé contient le système d'exploitation complet. Nous pouvons la brancher maintenant sur votre PC et vous verrez, en une minute, un système neuf, stable et sans aucun coût. Le test est sans risque, car il ne touche pas à votre Windows.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur18" }
+        ]
+      },
+
+      
+      bureauProviseur18: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: "(Hésite, tapote son bureau du doigt.) Un projet géré par des lycéens... est-ce vraiment professionnel ?",
+        choices: [
+          { text: "Suite", next: "CorentinImpatient2" }
+        ]
+      },
+      CorentinImpatient2: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "C'est plus que professionnel, Madame. C'est une démarche pédagogique pour les élèves de NSI, une sensibilisation pour tous les utilisateurs, et une solution économique pour la collectivité. Nous ne proposons pas un produit, nous proposons une méthode, comme cela est détaillé sur le site d'information que j'ai créé pour l'occasion : nird.forge.apps.education.fr.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur19" }
+        ]
+      },
+      bureauProviseur19: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        text: "(Corentin glisse la tablette à Mme Saray, affichant la page d'accueil de la forge.)",
+        choices: [
+          { text: "Suite", next: "CorentinImpatient3" }
+        ]
+      },
+      CorentinImpatient3: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/Corentin.png",
+        spritePos: "right",
+        name: "Corentin",
+        text: "En adoptant NIRD, vous ne faites pas qu'économiser de l'argent. Vous faites de notre lycée un établissement pilote, un modèle pour la région et pour la France.",
+        choices: [
+          { text: "Suite", next: "bureauProviseur20" }
+        ]
+      },
+      bureauProviseur20: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: "(Elle regarde la tablette, puis la clé USB, puis le groupe. Elle soupire.) ... Je vois. Vous avez bien préparé votre dossier. L'aspect sans risque de la démonstration sur clé USB est... convaincant.",
+        choices: [
+          { text: "Suite", next: "pdvEleve15" }
+        ]
+      },
+      if (True){
+        if (score > 0){
+            vari = karmaHaut1
+        }
+        else {
+          vari= karmaBas1
+        }
+    },
+
+      pdvEleve15: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "right",
+        name: "t/p",
+        text: "(Regarde Saray dans les yeux) Madame la Proviseure, nous sommes prêts. Si vous nous donnez le feu vert, nous lançons le club NIRD pour le reconditionnement dès la semaine prochaine.",
+        choices: [
+          { text: "Suite", next: null } // on ne met pas la scène ici
+        ]
+      },
+      karmaHaut1: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: "(Elle sourit très légèrement, une rareté) L'engagement... J'apprécie l'engagement. Très bien, Corentin, T/P. Vous avez ma bénédiction pour lancer la phase pilote sur la base de cette 'Live USB'. Réunissez votre équipe, contactez les services de la collectivité avec ce nouveau dossier et prouvez-moi que cette 'Démarche NIRD' est le futur de notre établissement.",
+        choices: [
+          { text: "Suite", next: "karmaHaut2" }
+        ]
+      },
+      karmaHaut2: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "right",
+        name: "t/p",
+        text: "La victoire était à nous. Nous avions non seulement sauvé les ordinateurs, mais nous avions transformé un désastre technique en un projet pédagogique, écologique et national. Le lycée était devenu un acteur des communs numériques. Grâce à Amadéa, Célia, Quentin, Anna, Loic, Adrien et l'incroyable plaidoyer de Corentin, le projet NIRD était lancé. Il ne restait plus qu'à commencer le reconditionnement.",
+        choices: [
+          { text: "Suite", next: "End" }
+        ]
+      },
+      karmaBas1: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/saray.png",
+        spritePos: "right",
+        name: "Mme Saray",
+        text: " (Son sourire disparaît) Je vois. Vous voulez le prestige du projet, mais pas le travail. Non merci. La responsabilité m'incombe. Je prends note de vos arguments, mais je ne peux pas confier un changement aussi structurel à un groupe qui se décharge de la mise en œuvre. Je vais confier le dossier à Quentin. Mais la démarche NIRD me semble effectivement supérieure à l'achat de licences.",
+        choices: [
+          { text: "Suite", next: "karmaHaut2" }
+        ]
+      },
+      karmaBas2: {
+        bg: "imagesVisualNovel/bureauProviseur.jpg",
+        sprite: "imagesVisualNovel/sil.png",
+        spritePos: "right",
+        name: "t/p",
+        text: "Nous avions gagné, mais le cœur n'y était pas. Mme Saray a adopté la solution NIRD, mais elle a retiré le projet au groupe d'élèves, le confiant entièrement à Quentin. Nous avions prouvé notre intelligence, mais pas notre maturité. Le lycée passait à Linux, mais nous avions perdu l'occasion de faire du reconditionnement un projet étudiant fédérateur. C'était une victoire amère.",
+        choices: [
+          { text: "Suite", next: "End" }
+        ]
+      },
+      End: {
+        bg: "imagesVisualNovel/Fin.jpg",
+        spritePos: "right",
+        name: "équipe de Dev Freddy Fazbear",
+        text: " Loïc : Main Programmer / Anna : Story Director / Corentin, Célia, Quentin : Writers / Saray : Design Director / Character Designer : Amadéa / Adrien, Célia : Programmer",
+        choices: [
+          { text: "Fin, merci d'avoir joué !", next: "salleInformaticien0" }
+        ]
+      },
+    };
+
+    const arrPlan = document.getElementById("background");
+    const nom = document.getElementById("name");
+    const texte = document.getElementById("text");
+    const choix = document.getElementById("choices");
+    const personnages = document.getElementById("characters");
+
+   function showScene(id) {
+  const scene = scenes[id];
+  if (!scene) return;
+
+  // Fond
+  arrPlan.style.backgroundImage = `url("${scene.bg}")`;
+
+  // Sprites (devant le background)
+  personnages.innerHTML = "";
+  if (scene.sprite) {
+    const img = document.createElement("img");
+    img.src = scene.sprite;
+    img.alt = "Personnage";
+
+    // Classe de position
+    let posClass = "char-center";
+    if (scene.spritePos === "left") posClass = "char-left";
+    if (scene.spritePos === "right") posClass = "char-right";
+
+    img.className = posClass;
+    personnages.appendChild(img);
+  }
+
+  // Texte + choix
+  nom.textContent = scene.name || "";
+  texte.textContent = scene.text || "";
+  choix.innerHTML = "";
+
+  scene.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = choice.text;
+
+    btn.onclick = () => {
+      // Cas spécial : on branche selon le score
+      if (id === "pdvEleve15") {
+        const nextId = score > 0 ? "karmaHaut1" : "karmaBas1";
+        showScene(nextId);
+      } else {
+        showScene(choice.next);
+      }
+    };
+
+    choix.appendChild(btn);
+  });
+}
+
+    // Démarrer le jeu
+    showScene("salleInformaticien0");
+  </script>
+</body>
+</html>

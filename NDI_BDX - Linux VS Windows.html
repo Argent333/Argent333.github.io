@@ -384,7 +384,7 @@
           { text: "je n’aurais jamais imaginé de telles conséquences, que pouvons-nous faire?", 
           next: "celia6",
         effect: () => {score += 1} },
-          { text: "Je comprends ton ignorance mais fais attention à tes mots…", 
+          { text: "toutes ces informations me donnent mal au crâne, je veux seulement me débarrasser du problème rapidement.", 
           next: "celia7",
         effect: () => {score -= 1} },
         ]
@@ -487,25 +487,9 @@
         bg: "imagesVisualNovel/jardin.jpeg",
         text: "(Célia part)",
         choices: [
-          { text: "Suite", next: "jardin4" } 
+          { text: "Suite", next: "couloir2" } 
         ]
       },
-
-      jardin4: {
-        bg: "imagesVisualNovel/jardin.jpeg",
-        sprite: "imagesVisualNovel/sil.png",
-        spritePos: "left",
-        name: "t/p",
-        text: "tout cela me semble passionnant! Et pour ne pas reproduire les erreurs du passé, nous pourrions organiser de la sensibilisation à la sobriété numérique pour tous les étudiants et le personnel de l’établissement. ",
-        choices: [
-          { text: "Mon plan énergétique est à présent prêt  mais il reste certains problèmes à régler...", next: "couloir2" }
-        ]
-      },
-
-
-
-
-
 
       couloir2: {
         bg: "imagesVisualNovel/couloirNormal.jpg",
@@ -785,16 +769,6 @@
         name: "t/p",
         text: "Anna, on a besoin de toi. On a une stratégie pour contrer la proviseure, mais il nous manque le 'comment'.",
         choices: [
-          { text: "Suite", next: "Anna1" }
-        ]
-      },
-      Anna1: {
-        bg: "imagesVisualNovel/bibli.jpeg",
-        sprite: "imagesVisualNovel/Anna.png",
-        spritePos: "right",
-        name: "Anna",
-        text: "Anna, on a besoin de toi. On a une stratégie pour contrer la proviseure, mais il nous manque le 'comment'.",
-        choices: [
           { text: "Suite", next: "pdvEleve12" }
         ]
       },
@@ -1023,7 +997,7 @@
         sprite: "imagesVisualNovel/loic-adrien.png",
         spritePos: "left",
         name: "Adrien (se radocit un peu)",
-        text: " Ça s'appelle la ‘stabilité’, Loic. Un concept étranger aux utilisateurs d'Arch Linux comme toi qui passent leurs nuits à réparer leur affichage graphique après une simple mise à jour.",
+        text: " Anna a eu raison de ne pas t'envoyer voir Quentin.",
         choices: [
           { text: "Suite", next: "Loic3" }
         ]
@@ -1105,7 +1079,7 @@
           next: "info6",
         effect: () => {score += 1} },
           { text: "Bof, l'informatique c'est magique, non ? Vous n'avez qu'à tout effacer et mettre le nouveau système. Si le réseau plante, vous le réparerez. L'important c'est d'aller vite !" ,
-           next:"info8",
+           next:"info9",
           effect: () => {score -= 1}}
 
         ]
@@ -1174,18 +1148,18 @@
         ]
       },
 
-      info7: {
+      info8: {
         bg: "imagesVisualNovel/salleInfoSombre.jpeg",
         sprite: "imagesVisualNovel/sil.png",
         spritePos: "center",
         name: "t/p ",
         text: " Oh euh.. D’accord.? Donnez moi juste cette clé!",
         choices: [
-          { text: "Suite", next: "info8" }
+          { text: "Suite", next: "info9" }
         ]
       },
 
-      info8: {
+      info9: {
         bg: "imagesVisualNovel/salleInfoSombre.jpeg",
         text: "(Loïc explose de rire. Adrien se prend la tête dans les mains, désespéré.)",
         choices: [
@@ -1245,22 +1219,22 @@
         name: "Adrien",
         text: "Contente-toi de brancher la clé et de ne toucher à RIEN d'autre. Et s'il te plaît, sors de la salle avant que je ne fasse une réaction allergique à ton ignorance.",
         choices: [
-          { text: "Suite", next: "info9" }
+          { text: "Suite", next: "info10" }
         ]
       },
 
-      info9: {
+      info10: {
         bg: "imagesVisualNovel/salleInfoSombre.jpeg",
         sprite: "imagesVisualNovel/sil.png",
         spritePos: "center",
         name: "t/p (Vexé(e)) ",
         text: "C'est bon... Je voulais juste aider.",
         choices: [
-          { text: "Suite", next: "info10" }
+          { text: "Suite", next: "info11" }
         ]
       },
 
-      info10: {
+      info11: {
         bg: "imagesVisualNovel/salleInfoSombre.jpeg",
         text: "(T/P part avec la clé, sous les regards méprisants du duo.)",
         choices: [
